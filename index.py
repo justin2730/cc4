@@ -37,18 +37,35 @@ def movie():
         showDate = show[0:10]
         showLength = show[13:]
 
+        rate = None
+        if(item.find ("div",class_="runtime").img !=None):
+            rate == item.find("div",class_="runtime").find("img").get("src")
+        if rate == "/imges/cer_G.gif":
+            rate = "普遍級 (一班觀眾皆可觀賞)"
+        elif rate == "/imges/cer_P.gif":
+            rate = "保護級(未滿六歲之兒童不得觀賞，六歲以上未滿十二歲之兒童須父母、師長或成年親友陪伴輔導觀賞)"
+        elif rate == "/imges/cer_F2.gif":
+            rate = "輔導級(未滿十二歲之兒童不得觀賞)"
+        elif rate == "/imges/cer_F5.gif":
+            rate = "輔導級(未滿十五歲之人不得觀賞)"
+        elif rate == "/imges/cer_R.gif":
+            rate = "限制級(未滿十八歲之人不得觀賞)"
+        else:
+            rate = "尚無電影分級資訊"
+
         doc = {
             "title": title,
             "picture": picture,
             "hyperlink": hyperlink,
             "showDate": showDate,
             "showLength": showLength,
-            "lastUpdate": lastUpdate
+            "lastUpdate": lastUpdate,
+            "rate":rate
          }
 
         doc_ref = db.collection("電影").document(movie_id)
         doc_ref.set(doc)
-    return "近期上映電影已爬蟲及存檔完畢，網站最近更新日期為：" + lastUpdate 
+        return "近期上映電影已爬蟲及存檔完畢，網站最近更新日期為：" + lastUpdate 
 
 @app.route("/search", methods=["POST","GET"])
 def search():
@@ -64,7 +81,8 @@ def search():
                 info += "海報：" + doc.to_dict()["picture"] + "<br>"
                 info += "影片介紹：" + doc.to_dict()["hyperlink"] + "<br>"
                 info += "片長：" + doc.to_dict()["showLength"] + " 分鐘<br>" 
-                info += "上映日期：" + doc.to_dict()["showDate"] + "<br><br>"           
+                info += "上映日期：" + doc.to_dict()["showDate"] + "<br>" 
+                info += "分級：" + doc.to_dict()["rate"] + "<br><br>"           
         return info
     else:  
         return render_template("input.html")
